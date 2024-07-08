@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
-function doPost23(e) {
+function doPost(e) {
   const name = e.parameter.name || "";
   const body = e.parameter.body || "";
 
@@ -13,8 +11,4 @@ function doPost23(e) {
   sheet.appendRow([name, body, "受付", new Date()]);
 
   return ContentService.createTextOutput(JSON.stringify({ message: "success!" }));
-}
-
-function hello() {
-  console.log(hello);
 }
