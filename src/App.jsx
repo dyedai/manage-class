@@ -4,12 +4,18 @@ import axios from "axios";
 
 function App() {
   const { register, handleSubmit } = useForm();
+  const deployID = "AKfycbw_5mlV0rcvMYJzzwimnKLU04v-7gHroRbiWeGPa14Fp_hoon_hoV5FJj2DjaScJPZe";
 
   const onSubmit = (data) => {
     axios
-      .post("", data)
+      .post(`https://script.google.com/macros/s/${deployID}/exec`, data, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
       .then((res) => {
         console.log("できた？", res.data);
+        alert("送信完了");
       })
       .catch((err) => {
         console.log(err);
@@ -27,8 +33,8 @@ function App() {
               <input
                 className="border block"
                 type="text"
-                {...register("title", {
-                  required: "タイトルを入力してください",
+                {...register("name", {
+                  required: "名前を入力してください",
                 })}
               />
             </label>
@@ -38,8 +44,8 @@ function App() {
                 rows={5}
                 className="border block"
                 type="text"
-                {...register("title", {
-                  required: "タイトルを入力してください",
+                {...register("body", {
+                  required: "問い合わせ内容を入力してください",
                 })}
               />
             </label>
