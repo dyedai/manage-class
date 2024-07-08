@@ -4,7 +4,7 @@ import axios from "axios";
 
 function App() {
   const { register, handleSubmit } = useForm();
-  const deployID = "AKfycbw_5mlV0rcvMYJzzwimnKLU04v-7gHroRbiWeGPa14Fp_hoon_hoV5FJj2DjaScJPZe";
+  const deployID = "AKfycbwdsRDrlb8wIZtzhcexbl0snaU-Uc2MaWN6b_rENZGeMiCw5L9qNifZ55yBJiDvqQaK";
 
   const onSubmit = (data) => {
     axios
@@ -14,10 +14,12 @@ function App() {
         },
       })
       .then((res) => {
-        console.log("できた？", res.data);
-        alert("送信完了");
+        console.log(res);
+        alert(res.data.message);
       })
       .catch((err) => {
+        console.log(err);
+        alert("エラーが発生しました");
         console.log(err);
       });
   };
