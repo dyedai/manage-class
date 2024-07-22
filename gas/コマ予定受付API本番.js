@@ -1,14 +1,14 @@
-function doPost(e) {
-  const name = e.parameter.name || "";
-  const body = e.parameter.body || "";
+// function doPost2(e) {
+//   const name = e.parameter.name || "";
+//   const body = e.parameter.body || "";
 
-  if (!name || !body) {
-    return ContentService.createTextOutput(JSON.stringify({ message: "validation error!" }));
-  }
+//   if (!name || !body) {
+//     return ContentService.createTextOutput(JSON.stringify({ message: "validation error!" }));
+//   }
 
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("シート2");
-  sheet.appendRow([name, body, "受付", new Date()]);
+//   const ss = SpreadsheetApp.getActiveSpreadsheet();
+//   const sheet = ss.getSheetByName("シート2");
+//   sheet.appendRow([name, body, "受付", new Date()]);
 
-  return ContentService.createTextOutput(JSON.stringify({ message: "success!" }));
-}
+//   return ContentService.createTextOutput(JSON.stringify({ message: "success!" }));
+// }
