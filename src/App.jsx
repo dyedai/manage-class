@@ -1,6 +1,7 @@
 import { Route, Routes, BrowserRouter } from "react-router-dom";
-import Test2 from "./test2";
-import TimeSlotForm from "./test1";
+
+import TimeSlotForm from "./Timeslotform";
+import Testsp from "./Testasp";
 
 function App() {
   return (
@@ -8,7 +9,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<TimeSlotForm />} />
-          <Route path="test" element={<Test2 />} />
+          <Route path="test" element={<Testsp />} />
         </Routes>
       </BrowserRouter>
     </>

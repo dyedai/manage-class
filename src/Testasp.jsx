@@ -2,7 +2,7 @@ import "./App.css";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 
-function Test2() {
+function Testsp() {
   const { register, handleSubmit } = useForm();
   const deployID = "AKfycbwdsRDrlb8wIZtzhcexbl0snaU-Uc2MaWN6b_rENZGeMiCw5L9qNifZ55yBJiDvqQaK";
 
@@ -64,4 +64,4 @@ function Test2() {
   );
 }
 
-export default Test2;
+export default Testsp;
