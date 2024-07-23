@@ -56,7 +56,7 @@ const TimeSlotForm = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [weekCount, setWeekCount] = useState(0);
-  const url = "https://script.google.com/macros/s/AKfycbyXCbJUFlkhsaeADDGPE1u21g4oPgBxD5TtUbawo0QArpNQUwCbJZYLmCXWK27eyRVL/exec";
+  const url = "https://script.google.com/macros/s/AKfycbwvHuCKbJgVoIYXgkmWs4Kv36vSmZewZNXHsc1L4BsOgOFENjrSLmnhOich855DGMjr/exec";
 
   const weekDays = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
   const timeSlots = ["9:00", "10:40", "13:00", "14:40", "16:40", "18:20", "20:00"];
@@ -74,8 +74,6 @@ const TimeSlotForm = () => {
         console.error("日付の取得に失敗しました:", error);
       }
     };
-    console.log(`開始日：${startDate}`);
-    console.log(`終了日：${endDate}`);
 
     fetchDates();
   }, []);
@@ -101,7 +99,14 @@ const TimeSlotForm = () => {
 
   const onSubmit = (data) => {
     setIsLoading_sub(true);
-    console.log("送信データ:", data);
+
+    // データを整形
+    const formattedData = Object.keys(data).reduce((acc, key) => {
+      acc[key] = data[key] || false; // undefined の場合は false にする
+      return acc;
+    }, {});
+
+    console.log("送信データ:", formattedData);
 
     fetch(url, {
       method: "POST",
@@ -109,7 +114,7 @@ const TimeSlotForm = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(formattedData),
     })
       .then((response) => {
         console.log("レスポンス:", response);
@@ -149,7 +154,7 @@ const TimeSlotForm = () => {
                 <h3 className="text-lg font-semibold mb-2">{weekStart.format("YYYY/MM/DD")} の週</h3>
                 {weekDays.map((day, dayIndex) => {
                   // ここを修正：日付の計算を調整
-                  const date = weekStart.add(dayIndex, "day");
+                  const date = weekStart.add(dayIndex, "day").startOf("day");
                   const fullDay = `${date.format("YYYY/MM/DD")}_${day}`;
                   return (
                     <Accordion

@@ -46,19 +46,25 @@ function doPost(e) {
     .filter((key) => key.includes("_"))
     .map((key) => key.split("_")[0])
     .filter((value, index, self) => self.indexOf(value) === index)
-    .sort();
+    .sort((a, b) => new Date(a) - new Date(b));
 
   // 二次元配列を作成
   const values = [];
   dates.forEach((date) => {
-    weekOrder.forEach((day) => {
-      const fullDay = `${date}_${day}`;
-      timeSlots.forEach((_, timeIndex) => {
-        const key = `${fullDay}_timeslot_${timeIndex}`;
-        values.push([data[key] === true ? "1" : ""]);
-      });
+    const dateObj = new Date(date);
+    weekOrder.forEach((day, dayIndex) => {
+      if (dateObj.getDay() === dayIndex) {
+        const fullDay = `${date}_${day}`;
+        timeSlots.forEach((_, timeIndex) => {
+          const key = `${fullDay}_timeslot_${timeIndex}`;
+          values.push([data[key] === true ? "1" : ""]);
+        });
+      }
     });
   });
+
+  // デバッグ用のログ出力
+  console.log("Processed data:", JSON.stringify(values));
 
   // 範囲を指定してデータを書き込み
   const range = sheet.getRange(2, 1, values.length, 1);
