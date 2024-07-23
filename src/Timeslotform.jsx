@@ -21,7 +21,7 @@ const Accordion = ({ day, children, isOpen, onClick, onCheckAll }) => {
   };
 
   return (
-    <div className={`duration-200 ease-out bg-white border rounded-md cursor-pointer group ${isOpen ? "border-neutral-200/60" : "border-transparent"}`}>
+    <div className={`m-1 duration-200 ease-out bg-white border rounded-md cursor-pointer group ${isOpen ? "border-neutral-200/60" : "border-transparent"}`}>
       <button
         onClick={handleToggle}
         className={`flex items-center justify-between w-full px-5 py-4 font-semibold text-left select-none ${isOpen ? "text-neutral-800" : "text-neutral-600 hover:text-neutral-800"}`}
@@ -50,12 +50,13 @@ Accordion.propTypes = {
 
 const TimeSlotForm = () => {
   const { register, handleSubmit, setValue } = useForm();
+  const [isLoading_sub, setIsLoading_sub] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [openDays, setOpenDays] = useState({});
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [weekCount, setWeekCount] = useState(0);
-  const url = "https://script.google.com/macros/s/AKfycbxHK8BQDyVC97RlvDEwTiz6H_rvCRWm4xX9j9-6cEkguhWc6ZmG_CFY7Twmcz60U1Ie/exec";
+  const url = "https://script.google.com/macros/s/AKfycbyXCbJUFlkhsaeADDGPE1u21g4oPgBxD5TtUbawo0QArpNQUwCbJZYLmCXWK27eyRVL/exec";
 
   const weekDays = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
   const timeSlots = ["9:00", "10:40", "13:00", "14:40", "16:40", "18:20", "20:00"];
@@ -68,10 +69,13 @@ const TimeSlotForm = () => {
         const data = await response.json();
         setStartDate(dayjs.tz(data.startDate, "Asia/Tokyo").format("YYYY-MM-DD"));
         setEndDate(dayjs.tz(data.endDate, "Asia/Tokyo").format("YYYY-MM-DD"));
+        setIsLoading(true);
       } catch (error) {
         console.error("日付の取得に失敗しました:", error);
       }
     };
+    console.log(`開始日：${startDate}`);
+    console.log(`終了日：${endDate}`);
 
     fetchDates();
   }, []);
@@ -94,8 +98,9 @@ const TimeSlotForm = () => {
       setValue(`${day}_timeslot_${index}`, isChecked);
     });
   };
+
   const onSubmit = (data) => {
-    setIsLoading(true);
+    setIsLoading_sub(true);
     console.log("送信データ:", data);
 
     fetch(url, {
@@ -108,7 +113,7 @@ const TimeSlotForm = () => {
     })
       .then((response) => {
         console.log("レスポンス:", response);
-        setIsLoading(false);
+        setIsLoading_sub(false);
         if (response.type === "opaque") {
           alert("予定が送信されました。実際の結果はスプレッドシートを確認してください。");
         } else {
@@ -117,32 +122,25 @@ const TimeSlotForm = () => {
       })
       .catch((error) => {
         console.error("エラー:", error);
-        setIsLoading(false);
+        setIsLoading_sub(false);
         alert("エラーが発生しました。");
       });
   };
 
+  if (!isLoading) {
+    return (
+      <>
+        <div className="flex h-screen flex-col items-center justify-center ">
+          <span className="loading loading-dots loading-lg"></span>
+        </div>
+      </>
+    );
+  }
+
   return (
-    <div className="flex h-screen flex-col items-center relative p-4">
+    <div className="flex h-full flex-col items-center relative p-4">
       <div className="w-full max-w-md mx-auto text-xs">
         <div className="mb-6 text-center text-4xl font-medium">週間予定表</div>
-        <div className="mb-4 flex justify-between">
-          <div>
-            <label htmlFor="startDate" className="mr-2">
-              開始日:
-            </label>
-            <input type="date" id="startDate" value={startDate} readOnly className="border rounded px-2 py-1" />
-          </div>
-          <div>
-            <label htmlFor="endDate" className="mr-2">
-              終了日:
-            </label>
-            <input type="date" id="endDate" value={endDate} readOnly className="border rounded px-2 py-1" />
-          </div>
-        </div>
-        <div className="mb-4">
-          <p>週数: {weekCount}</p>
-        </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           {Array.from({ length: weekCount }, (_, weekIndex) => {
             const weekStart = dayjs(startDate).add(weekIndex, "week");
@@ -150,12 +148,13 @@ const TimeSlotForm = () => {
               <div key={weekIndex} className="mb-6">
                 <h3 className="text-lg font-semibold mb-2">{weekStart.format("YYYY/MM/DD")} の週</h3>
                 {weekDays.map((day, dayIndex) => {
+                  // ここを修正：日付の計算を調整
                   const date = weekStart.add(dayIndex, "day");
                   const fullDay = `${date.format("YYYY/MM/DD")}_${day}`;
                   return (
                     <Accordion
                       key={fullDay}
-                      day={`${date.format("M/D")} (${day})`}
+                      day={`${date.format("M/D")} (${weekDays[date.day()]})`}
                       isOpen={!!openDays[fullDay]}
                       onClick={() => toggleDay(fullDay)}
                       onCheckAll={(isChecked) => handleDayCheck(fullDay, isChecked)}
@@ -163,7 +162,7 @@ const TimeSlotForm = () => {
                       {timeSlots.map((time, timeIndex) => (
                         <div key={`${fullDay}_${time}`} className="flex items-center mb-2">
                           <input type="checkbox" {...register(`${fullDay}_timeslot_${timeIndex}`)} className="mr-2" />
-                          <span className="text-blue-600">{time}</span>
+                          <span>{time}</span>
                         </div>
                       ))}
                     </Accordion>
@@ -173,17 +172,17 @@ const TimeSlotForm = () => {
             );
           })}
           <div className="block mt-4">
-            <button type="submit" className="bg-[#9117f5] rounded-lg text-white p-2 w-full" disabled={isLoading}>
+            <button type="submit" className="bg-[#9117f5] rounded-lg text-white p-2 w-full" disabled={isLoading_sub}>
               送信！
             </button>
           </div>
         </form>
       </div>
-      {isLoading && (
+      {isLoading_sub && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-5 rounded-lg shadow-lg text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#9117f5] mx-auto mb-4"></div>
-            <p className="text-xl font-semibold text-gray-700">ローディング中...</p>
+            <span className="loading loading-dots loading-lg"></span>
+            <p className="text-xl font-semibold text-gray-700">予定を送信中...</p>
           </div>
         </div>
       )}
